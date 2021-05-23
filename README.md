@@ -5,6 +5,6 @@ SCION is a global climate-biogeochemical model that runs over geological timesca
 
 Requies MATLAB. 
 
-For more informaiton on running the model see the Guidebook. For scientific derivaiton see the journal articles listed in the Guidebook.
+For more information on running the model see the Guidebook. For scientific derivaiton see the journal articles listed in the Guidebook.
 
 This code is free to use. The model is under continual revision/extension by my research group and collaborators. For any queries or collaboration ideas please email b.mills@leeds.ac.uk

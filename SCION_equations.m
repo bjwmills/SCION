@@ -372,7 +372,7 @@ P_min = 10 ;
 V_co2 = (P_atm - P_min) / (P_half + P_atm - P_min) ;
 
 %%%% effect of O2 on VEG
-V_o2 = 1.5 - 0.5*(O/pars.O0) ; %% COPSE forumla
+V_o2 = 1.5 - 0.5*(O/pars.O0) ; 
 
 %%%% full VEG limitation
 V_npp = 2*EVO*V_T*V_o2*V_co2 ;

@@ -1,13 +1,23 @@
 function dy = SCION_equations(t,y)
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%% SCION - Spatial Continuous Integration %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%% Earth Evolution Model %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%% Coded by BJW Mills
-%%%% b.mills@leeds.ac.uk
-%%%%
-%%%% model equations
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                                                                                               %
+%              110111010                                                                        %
+%           111010-1-----101                                                                    %
+%        1011111---------101111                                                                 %
+%      11011------------------101         SCION: Spatial Continuous Integration                 %
+%     111-----------------10011011        Earth Evolution Model                                 %
+%    1--10---------------1111011111                                                             %
+%    1---1011011---------1010110111       Coded by Benjamin J. W. Mills                         %
+%    1---1011000111----------010011       email: b.mills@leeds.ac.uk                            %
+%    1----1111011101----------10101                                                             %
+%     1----1001111------------0111        Model equations file                                  %
+%      1----1101-------------1101         contains flux and reservoir equations                 %
+%        1--111----------------1                                                                %
+%           1---------------1                                                                   %
+%               111011011                                                                       %
+%                                                                                               %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
 %%%%%%% setup dy array
@@ -64,7 +74,6 @@ CO2ppm = RCO2*280 ;
 mrO2 = ( O/pars.O0 )  /   ( (O/pars.O0)  + pars.copsek16 ) ;
 %%%%% relative moles of oxygen 
 RO2 =  O/pars.O0 ;
-%%%%% pO2 = mixing ratio * atmospheric pressure
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -120,6 +129,7 @@ SHORELINE = interp1qr(forcings.shoreline_time',forcings.shoreline_relative',t_ge
 f_biot = interp1qr([-1000e6 -525e6 -520e6 0]',[0 0 1 1]',t);
 CB = interp1qr([0 1]',[1.2 1]',f_biot) ;
 
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%   Sensitivity analysis  %%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -146,7 +156,6 @@ if sensanal == 1
     capdelC_land = 25 + 5*sensparams.randminusplus6 ;
     capdelC_marine = 30 + 5*sensparams.randminusplus7 ;
 end
-
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -226,9 +235,9 @@ GRID_AREA_km2 = INTERPSTACK.gridarea ;
 %%%%%%%%%%%%%%%%%   Spatial silicate weathering   %%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%%%% equation from Joshi et al., 2019 GRL
+%%%% West / Maffre weathering approximation
 
-% %%%% runoff in mm/yr
+%%%% runoff in mm/yr
 Q_past = RUNOFF_past ;
 Q_past(Q_past<0) = 0 ;
 Q_future = RUNOFF_future ;
@@ -296,7 +305,7 @@ CW_sum_future = sum(sum(CW_future)) ;
 CW_tot = CW_sum_past*contribution_past + CW_sum_future*contribution_future ;
 
 %%%% carbonate weathering spatial approximation, linear with runoff
-k_carb_scale = 200 ; %%%% scaling parameter to recover preent day rate
+k_carb_scale = 200 ; %%%% scaling parameter to recover present day rate
 CWcarb_per_km2_past = k_carb_scale * Q_past ; 
 CWcarb_per_km2_future = k_carb_scale * Q_future ; 
 %%%% CW total
@@ -478,10 +487,10 @@ denit = pars.k_denit * ( 1 + ( ANOX / (1-pars.k_oxfrac) )  ) * (N/pars.N0) ;
 %%%% reductant input
 reductant_input = pars.k_reductant_input * DEGASS ;
 
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%   Reservoir calculations  %%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 
 %%% Phosphate
 dy(1) = psea - mopb - capb - fepb ;
@@ -602,7 +611,7 @@ iso_res_S = S*d34s_S + PYR*delta_PYR + GYP*delta_GYP ;
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%   Print full states for single run   %%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%   Record full states for single run   %%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if sensanal == 0
     workingstate.iso_res_C(stepnumber,1) = iso_res_C ;
@@ -682,7 +691,7 @@ if sensanal == 0
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%   Print gridstates for single run   %%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%   Record gridstates for single run   %%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 if sensanal == 0
@@ -715,7 +724,7 @@ if sensanal == 0
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%   Print plotting states only in sensanal   %%%%%%%%
+%%%%%%%%%%%%%%%%%   Record plotting states only in sensanal   %%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 if sensanal == 1
@@ -752,6 +761,7 @@ if sensanal == 0
     end
 end
 
+
 %%%% record current model step
 stepnumber = stepnumber + 1 ;
 
@@ -763,7 +773,7 @@ end
 
 
 
-
+%%%% end function
 end
 
 

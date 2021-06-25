@@ -20,8 +20,11 @@ parfor N = 1:sensruns
 
 end
 
-%%%%%% define standard time grid for outputs
-tgrid = ( run(1).state.time(1) : 1e6 : run(1).state.time(end) ) ;
+%%%%%% define standard time grid for outputs using first model run's grid.
+tgrid =  run(1).state.time ;
+
+%%%%%% option for standard spaced grid
+% tgrid = ( run(1).state.time(1) : 1e6 : run(1).state.time(end) ) ;
 
 %%%%%% sens analysis states mapped to tgrid
 for N = 1:sensruns

@@ -226,7 +226,7 @@ TOPO_future = INTERPSTACK.topo(:,:,key_future_index) ;
 
 %%%% last keyframe land recorded for plot
 land_past = INTERPSTACK.land(:,:,key_past_index) ; 
-land_future = INTERPSTACK.land(:,:,key_past_index) ; 
+land_future = INTERPSTACK.land(:,:,key_future_index) ; 
 
 %%%% gridbox area
 GRID_AREA_km2 = INTERPSTACK.gridarea ;

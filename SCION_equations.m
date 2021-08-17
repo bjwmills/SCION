@@ -363,7 +363,7 @@ iceline = iceline_past * contribution_past +  iceline_future * contribution_futu
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%% effect of temp on VEG %%%% fixed
-V_T = 1 - (( (GAST - 15)/25 )^2) ;
+V_T = 1 - (( (GAST - 25)/25 )^2) ;
 
 %%%% effect of CO2 on VEG
 P_atm = CO2atm*1e6 ;

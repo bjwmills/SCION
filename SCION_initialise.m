@@ -21,7 +21,7 @@
 %%%%%%%%%%%%%%%%%   Define parameters   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function run = SCION_initialise(S)
+function run = SCION_initialise(runcontrol)
 
     %%%%%%% remove structures from pervious runs 
     clear stepnumber
@@ -59,7 +59,7 @@ function run = SCION_initialise(S)
     %%%%%%%%%%%%%%%%%   Check for sensitivity analysis   %%%%%%%%%%%%%%%%
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     
-    if S >= 1
+    if runcontrol >= 1
         sensanal = 1 ;
         plotrun = 0 ;
         pars.telltime = 0 ;
@@ -68,6 +68,7 @@ function run = SCION_initialise(S)
         plotrun = 1 ;
         pars.telltime = 1 ;
     end
+    pars.runcontrol = runcontrol ;
     
     %%%%%%% starting to load params
     if sensanal == 0 
@@ -253,7 +254,11 @@ function run = SCION_initialise(S)
     pars.whenend = 0 ;
 
     %%%% setp up grid stamp times
-    pars.runstamps = INTERPSTACK.time( INTERPSTACK.time > ( pars.whenstart * 1e-6 ) ) ;
+    if runcontrol == -2
+        pars.runstamps = 0 ;
+    else
+        pars.runstamps = INTERPSTACK.time( INTERPSTACK.time > ( pars.whenstart * 1e-6 ) ) ;
+    end
     pars.next_gridstamp = pars.runstamps(1) ;
     pars.gridstamp_number = 1 ;
     pars.finishgrid = 0 ;
@@ -310,7 +315,7 @@ function run = SCION_initialise(S)
     if isempty(Gtune) == 1
 
         outputs = [ 0.55 1 1.2 1 0.1 0.05 3 ] ;
-
+        
         pars.gstart = pars.G0 * outputs(1) ;
         pars.cstart = pars.C0 * outputs(2) ;
         pars.pyrstart = pars.PYR0 * outputs(3) ;
@@ -407,7 +412,7 @@ function run = SCION_initialise(S)
     %%%% only plot if no tuning structure exists, only plot fluxes for quick runs
     if isempty(Gtune) == 1
         if plotrun == 1            
-            if S>-1
+            if runcontrol>-1
                 SCION_plot_worldgraphic
             end
             SCION_plot_fluxes

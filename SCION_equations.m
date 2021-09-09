@@ -49,8 +49,12 @@ OSr = y(18) ;
 SSr = y(20) ;
 dSSr = y(21)/y(20) ;
 
-%%%% geological time in Ma
-t_geol = t*(1e-6) ;
+%%%% geological time in Ma (S=-2 sets a present day run)
+if pars.runcontrol == -2
+    t_geol = 0 ;
+else
+    t_geol = t*(1e-6) ;
+end
 
 %%%%%%% calculate isotopic fractionation of reservoirs
 delta_G = y(12)/y(5);
@@ -81,11 +85,11 @@ RO2 =  O/pars.O0 ;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%% COPSE Reloaded forcing set
-E_reloaded = interp1( 1e6 * forcings.t, forcings.E , t ) ;
-W_reloaded = interp1( 1e6 * forcings.t, forcings.W , t ) ;
+E_reloaded = interp1( forcings.t, forcings.E , t_geol ) ;
+W_reloaded = interp1( forcings.t, forcings.W , t_geol ) ;
 %%%% Additional forcings
-GR_BA = interp1( forcings.GR_BA(:,1) , forcings.GR_BA(:,2) , t ) ;
-newGA = interp1( forcings.newGA(:,1) , forcings.newGA(:,2) , t ) ;
+GR_BA = interp1( forcings.GR_BA(:,1)./1e6 , forcings.GR_BA(:,2) , t_geol ) ;
+newGA = interp1( forcings.newGA(:,1)./1e6 , forcings.newGA(:,2) , t_geol ) ;
 D_combined_mid = interp1( forcings.D_force_x , forcings.D_force_mid, t_geol) ;
 D_combined_min = interp1( forcings.D_force_x , forcings.D_force_min, t_geol) ;
 D_combined_max = interp1( forcings.D_force_x , forcings.D_force_max, t_geol) ;
@@ -126,7 +130,7 @@ capdelC_marine = 35  ;
 SHORELINE = interp1qr(forcings.shoreline_time',forcings.shoreline_relative',t_geol) ;
 
 %%%% bioturbation forcing
-f_biot = interp1qr([-1000e6 -525e6 -520e6 0]',[0 0 1 1]',t);
+f_biot = interp1qr([-1000 -525 -520 0]',[0 0 1 1]',t_geol);
 CB = interp1qr([0 1]',[1.2 1]',f_biot) ;
 
 
@@ -687,7 +691,11 @@ if sensanal == 0
     workingstate.relativenewp(stepnumber,1) = newp/pars.newp0 ;
     workingstate.erosion_tot(stepnumber,1) = erosion_tot ;
     %%%%%%%% print time
-    workingstate.time_myr(stepnumber,1) = t_geol ;
+    if pars.runcontrol == -2
+        workingstate.time_myr(stepnumber,1) = t.*1e-6 ;
+    else
+        workingstate.time_myr(stepnumber,1) = t_geol ;
+    end
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

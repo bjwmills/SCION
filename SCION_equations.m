@@ -85,14 +85,14 @@ RO2 =  O/pars.O0 ;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%% COPSE Reloaded forcing set
-E_reloaded = interp1( forcings.t, forcings.E , t_geol ) ;
-W_reloaded = interp1( forcings.t, forcings.W , t_geol ) ;
+E_reloaded = interp1qr( forcings.t', forcings.E' , t_geol ) ;
+W_reloaded = interp1qr( forcings.t', forcings.W' , t_geol ) ;
 %%%% Additional forcings
-GR_BA = interp1( forcings.GR_BA(:,1)./1e6 , forcings.GR_BA(:,2) , t_geol ) ;
-newGA = interp1( forcings.newGA(:,1)./1e6 , forcings.newGA(:,2) , t_geol ) ;
-D_combined_mid = interp1( forcings.D_force_x , forcings.D_force_mid, t_geol) ;
-D_combined_min = interp1( forcings.D_force_x , forcings.D_force_min, t_geol) ;
-D_combined_max = interp1( forcings.D_force_x , forcings.D_force_max, t_geol) ;
+GR_BA = interp1qr( forcings.GR_BA(:,1)./1e6 , forcings.GR_BA(:,2) , t_geol ) ;
+newGA = interp1qr( forcings.newGA(:,1)./1e6 , forcings.newGA(:,2) , t_geol ) ;
+D_combined_mid = interp1qr( forcings.D_force_x' , forcings.D_force_mid , t_geol) ;
+D_combined_min = interp1qr( forcings.D_force_x' , forcings.D_force_min , t_geol) ;
+D_combined_max = interp1qr( forcings.D_force_x' , forcings.D_force_max , t_geol) ;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%  Choose forcing functions  %%%%%%%%%%%%%%%%%%%%%%%%%
@@ -235,6 +235,11 @@ land_future = INTERPSTACK.land(:,:,key_future_index) ;
 %%%% gridbox area
 GRID_AREA_km2 = INTERPSTACK.gridarea ;
 
+%%%% topographic slope from interpstack
+tslope_past = INTERPSTACK.slope(:,:,key_past_index) ;
+tslope_future = INTERPSTACK.slope(:,:,key_future_index) ;
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%   Spatial silicate weathering   %%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -251,21 +256,7 @@ Q_future(Q_future<0) = 0 ;
 T_past = Tair_past + 273 ;
 T_future = Tair_future + 273 ;
 
-%%%% Erosion rate from Maffre et al. 2018
-model_elevation_past = TOPO_past ;
-model_elevation_future = TOPO_future ;
-model_elevation_past(isnan(model_elevation_past)==1) = 0 ;
-model_elevation_future(isnan(model_elevation_future)==1) = 0 ;
 
-%%%%% make lat and lon grids for erosion calculation
-lat_grid = INTERPSTACK.lat'.*ones(40,48) ;
-lon_grid = INTERPSTACK.lon.*ones(40,48) ;
-%%%%% gradient calculation
-[~,~,dFdyNorth_past,dFdxEast_past] = gradientm(lat_grid,lon_grid,model_elevation_past) ;
-[~,~,dFdyNorth_future,dFdxEast_future] = gradientm(lat_grid,lon_grid,model_elevation_future) ;
-%%%%% topographic slope
-tslope_past = ( dFdyNorth_past.^2 + dFdxEast_past.^2 ).^0.5 ;
-tslope_future = ( dFdyNorth_future.^2 + dFdxEast_future.^2 ).^0.5 ;
 %%%%% pierre erosion calculation, t/m2/yr
 k_erosion = 3.3e-3 ; %%%% for 16Gt present day erosion in FOAM
 EPSILON_past = k_erosion .* (Q_past.^0.31) .* tslope_past .* max(Tair_past,2) ;

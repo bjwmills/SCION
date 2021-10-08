@@ -106,11 +106,6 @@ for f = [1 2]
         %%%% make land and sea colormap with ice
         c = (1/255) .* [ 189 231 255 ; 79 124 0 ; 189 155 79 ; 189 155 79 ; 255 255 255 ] ;
 
-        %%%% rotate if 12th map onwards
-        if gridsub >= 12
-            this_TOPO = circshift(this_TOPO,[0 24]) ;
-        end
-
         %%%% plot simplified topography
         axes(ha(subnumber)) ;
         hold on
@@ -126,10 +121,7 @@ for f = [1 2]
         %%%% Nan out the ocean on Tair
         thisfield = gridstate.Tair(:,:,gridsub);
         thisfield(INTERPSTACK.land(:,:,gridsub) == 0 ) = NaN ;
-        %%%% rotate if 12th map onwards
-        if gridsub >= 12
-            thisfield = circshift(thisfield,[0 24]) ;
-        end
+
         %%%% plot Tair
         axes(ha(subnumber + length(choose_gridsubs) )) ;
         hold on
@@ -146,10 +138,7 @@ for f = [1 2]
         %%%% Nan out the ocean on Runoff
         thisfield = gridstate.Q(:,:,gridsub);
         thisfield(INTERPSTACK.land(:,:,gridsub) == 0 ) = NaN ;
-        %%%% rotate if 12th map onwards
-        if gridsub >= 12
-            thisfield = circshift(thisfield,[0 24]) ;
-        end
+ 
         %%%% plot Q
         axes(ha(subnumber + 2.*length(choose_gridsubs) )) ;
         hold on
@@ -167,10 +156,7 @@ for f = [1 2]
         %%%% Nan out the ocean on epsilon
         thisfield = gridstate.EPSILON(:,:,gridsub);
         thisfield(INTERPSTACK.land(:,:,gridsub) == 0 ) = NaN ;
-        %%%% rotate if 12th map onwards
-        if gridsub >= 12
-            thisfield = circshift(thisfield,[0 24]) ;
-        end
+ 
         %%%% plot epsilon
         axes(ha(subnumber + 3.*length(choose_gridsubs) )) ;
         hold on
@@ -187,10 +173,7 @@ for f = [1 2]
         %%%% Nan out the ocean on silw
         thisfield = gridstate.CW(:,:,gridsub);
         thisfield(INTERPSTACK.land(:,:,gridsub) == 0 ) = NaN ;
-        %%%% rotate if 12th map onwards
-        if gridsub >= 12
-            thisfield = circshift(thisfield,[0 24]) ;
-        end
+
         %%%% plot silw
         axes(ha(subnumber + 4.*length(choose_gridsubs) )) ;
         hold on

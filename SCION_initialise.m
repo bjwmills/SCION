@@ -180,7 +180,7 @@ function run = SCION_initialise(runcontrol)
     end
 
     %%%% load INTERPSTACK
-    load( 'forcings/INTERPSTACK_2021_improved.mat' ) ;
+    load( 'forcings/INTERPSTACK_oct_2021.mat' ) ;
 
     %%%% relative contribution from latitude bands
     lat_areas = (cosd(INTERPSTACK.lat))' ;
@@ -197,7 +197,7 @@ function run = SCION_initialise(runcontrol)
     forcings.newGA = xlsread('forcings/GA_revised.xlsx','','','basic') ;
     forcings.newGA(:,1) = forcings.newGA(:,1)*1e6 ; %%% correct Myr
     %%%% degassing rate
-    load('forcings/combined_D_force_revised.mat') ;
+    load('forcings/combined_D_force_oct_2021.mat') ;
     forcings.D_force_x = D_force_x ;
     forcings.D_force_mid = D_force_mid ;
     forcings.D_force_min = D_force_min ;

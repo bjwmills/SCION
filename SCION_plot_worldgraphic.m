@@ -120,7 +120,7 @@ for f = [1 2]
 
         %%%% Nan out the ocean on Tair
         thisfield = gridstate.Tair(:,:,gridsub);
-        thisfield(INTERPSTACK.land(:,:,gridsub) == 0 ) = NaN ;
+        thisfield(gridstate.land(:,:,gridsub) == 0 ) = NaN ;
 
         %%%% plot Tair
         axes(ha(subnumber + length(choose_gridsubs) )) ;
@@ -137,7 +137,7 @@ for f = [1 2]
 
         %%%% Nan out the ocean on Runoff
         thisfield = gridstate.Q(:,:,gridsub);
-        thisfield(INTERPSTACK.land(:,:,gridsub) == 0 ) = NaN ;
+        thisfield(gridstate.land(:,:,gridsub) == 0 ) = NaN ;
  
         %%%% plot Q
         axes(ha(subnumber + 2.*length(choose_gridsubs) )) ;
@@ -155,7 +155,7 @@ for f = [1 2]
 
         %%%% Nan out the ocean on epsilon
         thisfield = gridstate.EPSILON(:,:,gridsub);
-        thisfield(INTERPSTACK.land(:,:,gridsub) == 0 ) = NaN ;
+        thisfield(gridstate.land(:,:,gridsub) == 0 ) = NaN ;
  
         %%%% plot epsilon
         axes(ha(subnumber + 3.*length(choose_gridsubs) )) ;
@@ -172,7 +172,7 @@ for f = [1 2]
 
         %%%% Nan out the ocean on silw
         thisfield = gridstate.CW(:,:,gridsub);
-        thisfield(INTERPSTACK.land(:,:,gridsub) == 0 ) = NaN ;
+        thisfield(gridstate.land(:,:,gridsub) == 0 ) = NaN ;
 
         %%%% plot silw
         axes(ha(subnumber + 4.*length(choose_gridsubs) )) ;

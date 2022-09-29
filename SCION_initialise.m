@@ -395,6 +395,7 @@ function run = SCION_initialise(runcontrol)
     run.state = state ;
     run.gridstate = gridstate ;
     run.pars = pars ;
+    run.sensparams = sensparams ;
     run.forcings = forcings ;
     
     if sensanal == 0

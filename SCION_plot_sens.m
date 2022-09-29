@@ -172,6 +172,14 @@ patch(T_x,T_y,pc2,'edgecolor','none')
 plot((sens.time_myr),mean(sens.T_gast,2),'linewidth',1,'color',c_mean)
 plot((sens.time_myr),max(sens.T_gast,[],2),'linewidth',0.5,'color',c_range)
 plot((sens.time_myr),min(sens.T_gast,[],2),'linewidth',0.5,'color',c_range)
+%%%% plot this model torpical T
+plot((sens.time_myr),mean(sens.SAT_tropical,2),'linewidth',1,'color',c_mean)
+plot((sens.time_myr),max(sens.SAT_tropical,[],2),'linewidth',0.5,'color',c_range)
+plot((sens.time_myr),min(sens.SAT_tropical,[],2),'linewidth',0.5,'color',c_range)
+%%%% plot this model equatorial T
+plot((sens.time_myr),mean(sens.SAT_equator,2),'linewidth',1,'color',c_mean)
+plot((sens.time_myr),max(sens.SAT_equator,[],2),'linewidth',0.5,'color',c_range)
+plot((sens.time_myr),min(sens.SAT_equator,[],2),'linewidth',0.5,'color',c_range)
 
 %%%% ICE LINE
 subplot(5,2,9)

@@ -745,6 +745,8 @@ if sensanal == 1
     workingstate.mrO2(stepnumber,1) = mrO2 ;
     workingstate.iceline(stepnumber,1) = iceline ;
     workingstate.T_gast(stepnumber,1) = TEMP_gast - 273 ;
+    workingstate.SAT_tropical(stepnumber,1) = SAT_tropical ;
+    workingstate.SAT_equator(stepnumber,1) = SAT_equator ;
     workingstate.ANOX(stepnumber,1) = ANOX ;
     workingstate.P(stepnumber,1) = P/pars.P0 ;
     workingstate.N(stepnumber,1) = N/pars.N0 ;

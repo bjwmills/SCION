@@ -1,7 +1,7 @@
 # SCION
 ## Spatial Continuous Integration - Earth Evolution Model
 
-### Current version V1.1.5b - January 2023
+### Current version v1.1.5b - January 2023
 
 SCION is a global climate-biogeochemical model that runs over geological timescales. It runs forwards in time and computes the Earth’s major elemental cycles and surface climate. It also predicts the values of a suite of geochemical tracers to aid in hypothesis testing. 
 

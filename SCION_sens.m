@@ -8,7 +8,7 @@
 %%%% model sensitivity analysis initialiser
 
 %%%%%% number of runs
-sensruns = 1000 ;
+sensruns = 2 ;
 
 %%%%%%% multiple runs
 parfor N = 1:sensruns
@@ -36,3 +36,8 @@ end
 
 %%%%%% plotting
 SCION_plot_sens
+
+%%%%%% write output file
+save(SCION_output)
+
+save('results.mat','sens','-mat')

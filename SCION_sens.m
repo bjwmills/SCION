@@ -36,3 +36,6 @@ end
 
 %%%%%% plotting
 SCION_plot_sens
+
+%%%%%% write output file
+save('SCION_results.mat','sens','-mat')

@@ -67,8 +67,8 @@ pc6 = [82 56 100]./255 ;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%% load geochem data
-load('data\geochem_data_2020.mat')
-load('data\Scotese_GAT_2021.mat')
+load('data/geochem_data_2020.mat')
+load('data/Scotese_GAT_2021.mat')
 
 %%%%%%% make figure
 figure('Color',[1 0.98 0.95])

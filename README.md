@@ -2,7 +2,7 @@
   <img src="https://bjwmills.com/wp-content/uploads/2023/09/SCION_banner.png" alt="SCION" style="width:700px;"/>
 </p>
 
-SCION is a global climate-biogeochemical model that runs over geological timescales. It runs forwards in time and computes the Earth’s major elemental cycles and surface climate. It also predicts the values of a suite of geochemical tracers to aid in hypothesis testing. It is a mixed dimensional system with a steady state 3D interpolated climate, 2D land surface and nondimensional ocean.
+SCION (Spatial Continuous IntegratiON) is a global climate-biogeochemical model that runs over geological timescales. It is a mixed dimensional system with a steady state 3D interpolated climate, 2D land surface and nondimensional ocean. It runs forwards in time and computes the Earth’s major elemental cycles and surface climate. It also predicts the values of a suite of geochemical tracers to aid in hypothesis testing. 
 
 <p align="center">
   <img src="http://bjwmills.com/wp-content/uploads/2023/09/SCION_outline.png" alt="SCION" style="width:700px;"/>

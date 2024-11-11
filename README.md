@@ -12,4 +12,6 @@ SCION (Spatial Continuous IntegratiON) is a global climate-biogeochemical model 
 
 For more information on model derivation and running the model, see the Guidebook in the documentation folder.
 
+For tutorial videos see the [Earth Evolution Modelling Group code page](https://earthevolutionmodelling.com/code)
+
 This code is free to use. The model is under continual revision/extension by my research group and collaborators. For any queries or collaboration ideas please email b.mills@leeds.ac.uk

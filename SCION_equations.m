@@ -87,6 +87,8 @@ RO2 =  O/pars.O0 ;
 %%%% COPSE Reloaded forcing set
 E_reloaded = interp1qr( forcings.t', forcings.E' , t_geol ) ;
 W_reloaded = interp1qr( forcings.t', forcings.W' , t_geol ) ;
+
+
 %%%% Additional forcings
 GR_BA = interp1qr( forcings.GR_BA(:,1)./1e6 , forcings.GR_BA(:,2) , t_geol ) ;
 newGA = interp1qr( forcings.newGA(:,1)./1e6 , forcings.newGA(:,2) , t_geol ) ;
@@ -232,6 +234,32 @@ TOPO_future = INTERPSTACK.topo(:,:,key_future_index) ;
 land_past = INTERPSTACK.land(:,:,key_past_index) ; 
 land_future = INTERPSTACK.land(:,:,key_future_index) ; 
 
+
+%%%% land occupied by plants
+if key_past_index < 5
+    plants_past = 0 ;
+end
+if key_future_index < 5
+    plants_future = 0 ;
+end   
+if key_past_index == 5
+    plants_past = forcings.plant_forcing ;
+end
+if key_future_index == 5
+    plants_future = forcings.plant_forcing ;
+end
+if key_past_index > 5
+    plants_past = land_past ;
+end
+if key_future_index > 5
+    plants_future = land_future ;
+end   
+    
+
+% %%%% akternative with plants everywhere
+% plants_future = land_future ;
+% plants_past = land_past ;
+
 %%%% gridbox area
 GRID_AREA_km2 = INTERPSTACK.gridarea ;
 
@@ -289,9 +317,64 @@ R_reg_future = ( (z./EPSILON_future).^sigplus1 ) ./ sigplus1 ;
 %%%% equation for CW per km2 in each box
 CW_per_km2_past = 1e6 .* EPSILON_past .* Xm .* ( 1 - exp( -1.* K .* R_Q_past .* R_T_past .* R_reg_past ) ) ; 
 CW_per_km2_future = 1e6 .* EPSILON_future .* Xm .* ( 1 - exp( -1.* K .* R_Q_future .* R_T_future .* R_reg_future ) ) ; 
+
+
+
+%%%%% calculate biotic weathering
+
+%%%% global average surface temperature
+GAST = mean(mean( Tair_past .* pars.rel_contrib ))*contribution_past  +  mean(mean( Tair_future .* pars.rel_contrib ))*contribution_future  ;
+%%%% tropical surface temperature (24 S to 24 N gridcells)
+SAT_tropical = mean(mean( Tair_past(15:26,:) .* pars.rel_contrib(15:26,:)*0.67 ))*contribution_past  +  mean(mean( Tair_future(15:26,:) .* pars.rel_contrib(15:26,:)*0.67 ))*contribution_future  ;
+%%%% equatorial surface temperature (equal contribution from 2S and 2N lat bands)
+SAT_equator = mean(mean( Tair_past(20:21,:)))*contribution_past  +  mean(mean( Tair_future(20:21,:) ))*contribution_future  ;
+
+
+
+%%%% effect of temp on VEG %%%% fixed
+V_T = 1 - (( (GAST - 25)/25 )^2) ;
+
+%%%% effect of CO2 on VEG
+P_atm = CO2atm*1e6 ;
+P_half = 183.6 ;
+P_min = 10 ;
+V_co2 = (P_atm - P_min) / (P_half + P_atm - P_min) ;
+
+%%%% effect of O2 on VEG
+V_o2 = 1.5 - 0.5*(O/pars.O0) ; 
+
+%%%% full VEG limitation
+V_npp = 2*EVO*V_T*V_o2*V_co2 ;
+
+%%%% COPSE reloaded fire feedback
+ignit = min(max(48*mrO2 - 9.08 , 0) , 5 ) ;
+firef = pars.kfire/(pars.kfire - 1 + ignit) ;
+
+%%%%% Mass of terrestrial biosphere
+VEG = V_npp * firef ;
+
+%%%%%% basalt and granite temp dependency - direct and runoff
+Tsurf = GAST + 273 ;
+TEMP_gast = Tsurf ;
+
+%%%% COPSE reloaded fbiota
+V = VEG ;
+f_biota = ( 1 - min( V*W , 1 ) ) * PREPLANT * (RCO2^0.5) + (V*W) ;
+
+
+%%%%% apply f biota value only to vegetated part of grid
+f_biota_past = f_biota.*plants_past ;
+f_biota_future = f_biota.*plants_future ;
+
+
 %%%% CW total
-CW_past = CW_per_km2_past .* GRID_AREA_km2 ;
-CW_future = CW_per_km2_future .* GRID_AREA_km2 ;
+CW_past_abiotic = CW_per_km2_past .* GRID_AREA_km2 .* PREPLANT  ;
+CW_future_abiotic = CW_per_km2_future .* GRID_AREA_km2 .* PREPLANT ;
+CW_past_biotic = CW_per_km2_past .* GRID_AREA_km2 .* f_biota_past  ;
+CW_future_biotic = CW_per_km2_future .* GRID_AREA_km2 .* f_biota_future;
+CW_past = max(CW_past_abiotic,CW_past_biotic) ;
+CW_future = max(CW_future_abiotic,CW_future_biotic) ;
+
 %%%% world CW
 CW_past(isnan(CW_past)==1) = 0 ;
 CW_future(isnan(CW_future)==1) = 0 ;
@@ -322,13 +405,6 @@ silw_scale = 4.2e8 ; %%%% for k erosion 3.3e-3
 %%%% overall spatial weathering
 silw_spatial = CW_tot * ( (pars.k_basw + pars.k_granw) / silw_scale) ;
 carbw_spatial = ( CWcarb_sum_past*contribution_past + CWcarb_sum_future*contribution_future ) ;
-
-%%%% global average surface temperature
-GAST = mean(mean( Tair_past .* pars.rel_contrib ))*contribution_past  +  mean(mean( Tair_future .* pars.rel_contrib ))*contribution_future  ;
-%%%% tropical surface temperature (24 S to 24 N gridcells)
-SAT_tropical = mean(mean( Tair_past(15:26,:) .* pars.rel_contrib(15:26,:)*0.67 ))*contribution_past  +  mean(mean( Tair_future(15:26,:) .* pars.rel_contrib(15:26,:)*0.67 ))*contribution_future  ;
-%%%% equatorial surface temperature (equal contribution from 2S and 2N lat bands)
-SAT_equator = mean(mean( Tair_past(20:21,:)))*contribution_past  +  mean(mean( Tair_future(20:21,:) ))*contribution_future  ;
 
 
 %%%% set assumed ice temperature
@@ -361,36 +437,6 @@ iceline = iceline_past * contribution_past +  iceline_future * contribution_futu
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%   Global variables   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%%%% effect of temp on VEG %%%% fixed
-V_T = 1 - (( (GAST - 25)/25 )^2) ;
-
-%%%% effect of CO2 on VEG
-P_atm = CO2atm*1e6 ;
-P_half = 183.6 ;
-P_min = 10 ;
-V_co2 = (P_atm - P_min) / (P_half + P_atm - P_min) ;
-
-%%%% effect of O2 on VEG
-V_o2 = 1.5 - 0.5*(O/pars.O0) ; 
-
-%%%% full VEG limitation
-V_npp = 2*EVO*V_T*V_o2*V_co2 ;
-
-%%%% COPSE reloaded fire feedback
-ignit = min(max(48*mrO2 - 9.08 , 0) , 5 ) ;
-firef = pars.kfire/(pars.kfire - 1 + ignit) ;
-
-%%%%% Mass of terrestrial biosphere
-VEG = V_npp * firef ;
-
-%%%%%% basalt and granite temp dependency - direct and runoff
-Tsurf = GAST + 273 ;
-TEMP_gast = Tsurf ;
-
-%%%% COPSE reloaded fbiota
-V = VEG ;
-f_biota = ( 1 - min( V*W , 1 ) ) * PREPLANT * (RCO2^0.5) + (V*W) ;
 
 %%%% version using gran area and conserving total silw
 basw = silw_spatial * ( pars.basfrac * BAS_AREA / ( pars.basfrac * BAS_AREA + ( 1 - pars.basfrac  ) *GRAN_AREA ) ) ;
@@ -435,7 +481,11 @@ mccb = carbw + silw ;
 pfrac_silw = 0.8 ;
 pfrac_carbw = 0.14 ;
 pfrac_oxidw = 0.06 ;
-phosw = pars.k_phosw*( (pfrac_silw)*( silw/pars.k_silw )  +   (pfrac_carbw)*( carbw/pars.k_carbw ) +  (pfrac_oxidw)*(  oxidw/ pars.k_oxidw )  )  ;
+
+% amplification_factor = interp1qr([-600 -480 -470 -360 -350 0]',[1 1 1.5 1.5 1 1]',t_geol) ;
+amplification_factor = 1 ;
+
+phosw = amplification_factor* pars.k_phosw*( (pfrac_silw)*( silw/pars.k_silw )  +   (pfrac_carbw)*( carbw/pars.k_carbw ) +  (pfrac_oxidw)*(  oxidw/ pars.k_oxidw )  )  ;
 
 %%%% COPSE reloaded
 pland = pars.k_landfrac * VEG * phosw  ;

@@ -1,3 +1,4 @@
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                                                                                               %
 %              110111010                                                                        %
@@ -6,7 +7,7 @@
 %      11011------------------101         SCION: Spatial Continuous Integration                 %
 %     111-----------------10011011        Earth Evolution Model                                 %
 %    1--10---------------1111011111                                                             %
-%    1---1011011---------1010110111       Coded by Benjamin J. W. Mills                         %
+%    1---1011011---------1010110111       Lead developer: Benjamin J. W. Mills                  %
 %    1---1011000111----------010011       email: b.mills@leeds.ac.uk                            %
 %    1----1111011101----------10101                                                             %
 %     1----1001111------------0111        Model initialiser                                     %
@@ -47,13 +48,8 @@ function run = SCION_initialise(runcontrol)
     global plotrun
     global sensparams
     %%%% global tuning variables
-    global Gtune
-    global Ctune
-    global PYRtune
-    global GYPtune
-    global Atune
-    global Otune
-    global Stune
+    global tuning
+ 
     
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %%%%%%%%%%%%%%%%%   Check for sensitivity analysis   %%%%%%%%%%%%%%%%
@@ -180,7 +176,8 @@ function run = SCION_initialise(runcontrol)
     end
 
     %%%% load INTERPSTACK
-    load( 'forcings/INTERPSTACK_oct_2021.mat' ) ;
+    load( 'forcings/INTERPSTACK_1Ga_2025.mat' ) ;
+    
 
     %%%% relative contribution from latitude bands
     lat_areas = (cosd(INTERPSTACK.lat))' ;
@@ -197,11 +194,11 @@ function run = SCION_initialise(runcontrol)
     forcings.newGA = xlsread('forcings/GA_revised.xlsx','','','basic') ;
     forcings.newGA(:,1) = forcings.newGA(:,1)*1e6 ; %%% correct Myr
     %%%% degassing rate
-    load('forcings/combined_D_force_oct_2021.mat') ;
-    forcings.D_force_x = D_force_x ;
-    forcings.D_force_mid = D_force_mid ;
-    forcings.D_force_min = D_force_min ;
-    forcings.D_force_max = D_force_max ;
+    load('forcings/combined_D_force_1000_rev.mat') ;
+    forcings.D_force_x = xgrid ;    
+    forcings.D_force_min = newmin ;
+    forcings.D_force_max = newmax ;
+    forcings.D_force_mid = (newmin + newmax) ./ 2 ;
     
     %%%% load shoreline forcing
     load('forcings/shoreline.mat') ;
@@ -230,6 +227,17 @@ function run = SCION_initialise(runcontrol)
         sensparams.randminusplus6 = 2*(0.5 - rand) ;
         sensparams.randminusplus7 = 2*(0.5 - rand) ;    
     end
+    % 
+    % if sensanal == 1
+    %     %%%% test sensitivity structures by running standard run each time
+    %     sensparams.randminusplus1 = 1 ;
+    %     sensparams.randminusplus2 = 1 ;
+    %     sensparams.randminusplus3 = 1 ;
+    %     sensparams.randminusplus4 = 1 ;
+    %     sensparams.randminusplus5 = 1 ;
+    %     sensparams.randminusplus6 = 1 ;
+    %     sensparams.randminusplus7 = 1 ;    
+    % end
 
 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -250,7 +258,7 @@ function run = SCION_initialise(runcontrol)
     end
 
     %%%%%%% model timeframe in years (0 = present day)
-    pars.whenstart = - 600e6 ;
+    pars.whenstart = - 1000e6 ;
     pars.whenend = 0 ;
 
     %%%% setp up grid stamp times
@@ -263,17 +271,14 @@ function run = SCION_initialise(runcontrol)
     pars.gridstamp_number = 1 ;
     pars.finishgrid = 0 ;
 
-    %%%%%%% Show current timestep in command window? (1 = yes, 0 = no)
-    pars.telltime = 1;
-
-    %%%%%%% set number of model steps to take before beiling out
-    pars.bailnumber = 1e5;
+    % %%%%%%% Show current timestep in command window? (1 = yes, 0 = no)
+    % pars.telltime = 1;
 
     %%%%%%% display every n model steps whilst running
     pars.display_resolution = 200 ;
 
     %%%%%%% set maximum step size for solver
-    options = odeset('maxstep',1e6) ;
+    options = odeset('maxstep',5e5) ;
 
     %%%% set stepnumber to 1
     stepnumber = 1 ;
@@ -298,24 +303,24 @@ function run = SCION_initialise(runcontrol)
     %%%%%%%%%%%%%%%%%   Initial parameter tuning option  %%%%%%%%%%%%%%%%
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-    if isempty(Gtune) == 0
-        pars.ostart = pars.O0 * abs( Otune )  ;
-        pars.astart = pars.A0 * abs( Atune ) ;
-        pars.sstart = pars.S0 * abs( Stune ) ;
-        pars.gstart = pars.G0 * abs( Gtune ) ;
-        pars.cstart = pars.C0 * abs( Ctune ) ;
-        pars.pyrstart = pars.PYR0 * abs( PYRtune ) ;
-        pars.gypstart = pars.GYP0 * abs( GYPtune ) ; 
+    if isempty(tuning) == 0
+        pars.ostart = pars.O0 * abs( tuning.Otune )  ;
+        pars.astart = pars.A0 * abs( tuning.Atune ) ;
+        pars.sstart = pars.S0 * abs( tuning.Stune ) ;
+        pars.gstart = pars.G0 * abs( tuning.Gtune ) ;
+        pars.cstart = pars.C0 * abs( tuning.Ctune ) ;
+        pars.pyrstart = pars.PYR0 * abs( tuning.PYRtune ) ;
+        pars.gypstart = pars.GYP0 * abs( tuning.GYPtune ) ; 
     end
     
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
     %%%%% if no tuning use previously tuned values
-    if isempty(Gtune) == 1
+    if isempty(tuning) == 1
 
-        outputs = [ 0.55 1 1.2 1 0.1 0.05 3 ] ;
-        
+        % outputs = [ 0.45 1 1.1 1 0.1 0.05 3 ] ;
+        outputs = [0.45	1 1.1 0.875 0.17 0.05 6.5] ;
         pars.gstart = pars.G0 * outputs(1) ;
         pars.cstart = pars.C0 * outputs(2) ;
         pars.pyrstart = pars.PYR0 * outputs(3) ;
@@ -387,8 +392,17 @@ function run = SCION_initialise(runcontrol)
 
     %%%%%% assemble output state vectors
     field_names = fieldnames(workingstate) ;
+
     for numfields = 1:length(field_names)
+
+        %%%% assign output states
         eval([' state.' char( field_names(numfields) ) ' = workingstate.' char( field_names(numfields) ) '(trecords) ; '])
+
+        %%%% sort time vector to catch backtracking
+        [timesort sortindex] = sort(sharedvals) ;
+
+        %%%% reorder states
+        eval([' state.' char( field_names(numfields) ) ' = state.' char( field_names(numfields) ) '(sortindex) ; '])
     end
 
     %%%%%% save state
@@ -411,7 +425,7 @@ function run = SCION_initialise(runcontrol)
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
     %%%% only plot if no tuning structure exists, only plot fluxes for quick runs
-    if isempty(Gtune) == 1
+    if isempty(tuning) == 1
         if plotrun == 1            
             if runcontrol>-1
                 SCION_plot_worldgraphic

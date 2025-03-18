@@ -1,11 +1,21 @@
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%% SCION - Spatial Continuous Integration %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%% Earth Evolution Model %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%% Coded by BJW Mills
-%%%% b.mills@leeds.ac.uk
-%%%%
-%%%% plot sensitivity analysis
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                                                                                               %
+%              110111010                                                                        %
+%           111010-1-----101                                                                    %
+%        1011111---------101111                                                                 %
+%      11011------------------101         SCION: Spatial Continuous Integration                 %
+%     111-----------------10011011        Earth Evolution Model                                 %
+%    1--10---------------1111011111                                                             %
+%    1---1011011---------1010110111       Lead developer: Benjamin J. W. Mills                  %
+%    1---1011000111----------010011       email: b.mills@leeds.ac.uk                            %
+%    1----1111011101----------10101                                                             %
+%     1----1001111------------0111        Sensitivity analysis plotting script                  %
+%      1----1101-------------1101         CALLED IN SCRIPT - DO NOT RUN DIRECTLY                %
+%        1--111----------------1                                                                %
+%           1---------------1                                                                   %
+%               111011011                                                                       %
+%                                                                                               %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%% define colours
 c_mean = [255 132 34]./255 ;
@@ -38,17 +48,17 @@ subplot(5,2,1)
 hold on
 box on
 xlabel('Time (Ma)')
-ylabel('\delta^{13}C_{carb}')
+ylabel('Forcings')
 %%%% plot DEGASS
-plot((sens.time_myr),mean(sens.DEGASS,2),'linewidth',1,'color',c_mean)
+plot((sens.time_myr),nanmean(sens.DEGASS,2),'linewidth',1,'color',c_mean)
 plot((sens.time_myr),max(sens.DEGASS,[],2),'linewidth',0.5,'color',c_range)
 plot((sens.time_myr),min(sens.DEGASS,[],2),'linewidth',0.5,'color',c_range)
 %%%% plot GRAN_AREA
-plot((sens.time_myr),mean(sens.GRAN_AREA,2),'linewidth',1,'color',c_mean)
+plot((sens.time_myr),nanmean(sens.GRAN_AREA,2),'linewidth',1,'color',c_mean)
 plot((sens.time_myr),max(sens.GRAN_AREA,[],2),'linewidth',0.5,'color',c_range)
 plot((sens.time_myr),min(sens.GRAN_AREA,[],2),'linewidth',0.5,'color',c_range)
 %%%% plot BAS_AREA
-plot((sens.time_myr),mean(sens.BAS_AREA,2),'linewidth',1,'color',c_mean)
+plot((sens.time_myr),nanmean(sens.BAS_AREA,2),'linewidth',1,'color',c_mean)
 plot((sens.time_myr),max(sens.BAS_AREA,[],2),'linewidth',0.5,'color',c_range)
 plot((sens.time_myr),min(sens.BAS_AREA,[],2),'linewidth',0.5,'color',c_range)
 
@@ -61,7 +71,7 @@ ylabel('\delta^{13}C_{carb}')
 %%%% plot data comparison
 plot(d13c_x,d13c_y,'.','color',pc2)
 %%%% plot this model
-plot((sens.time_myr),mean(sens.delta_mccb,2),'linewidth',1,'color',c_mean)
+plot((sens.time_myr),nanmean(sens.delta_mccb,2),'linewidth',1,'color',c_mean)
 plot((sens.time_myr),max(sens.delta_mccb,[],2),'linewidth',0.5,'color',c_range)
 plot((sens.time_myr),min(sens.delta_mccb,[],2),'linewidth',0.5,'color',c_range)
 
@@ -74,7 +84,7 @@ ylabel('\delta^{34}S_{sw}')
 %%%% plot data comparison
 plot(d34s_x,d34s_y,'.','color',pc2)
 %%%% plot this model
-plot((sens.time_myr),mean(sens.d34s_S,2),'linewidth',1,'color',c_mean)
+plot((sens.time_myr),nanmean(sens.d34s_S,2),'linewidth',1,'color',c_mean)
 plot((sens.time_myr),max(sens.d34s_S,[],2),'linewidth',0.5,'color',c_range)
 plot((sens.time_myr),min(sens.d34s_S,[],2),'linewidth',0.5,'color',c_range)
 
@@ -88,7 +98,7 @@ ylabel('^{87}Sr/^{86}Sr seawater')
 %%%% plot data comparison
 plot(sr_x,sr_y,'color',pc2)
 %%%% plot this model
-plot((sens.time_myr),mean(sens.delta_OSr,2),'linewidth',1,'color',c_mean)
+plot((sens.time_myr),nanmean(sens.delta_OSr,2),'linewidth',1,'color',c_mean)
 plot((sens.time_myr),max(sens.delta_OSr,[],2),'linewidth',0.5,'color',c_range)
 plot((sens.time_myr),min(sens.delta_OSr,[],2),'linewidth',0.5,'color',c_range)
 
@@ -107,7 +117,7 @@ for u = 1:2:length(SO4_x-1)
    plot( [SO4_x(u) SO4_x(u)] , [SO4_y(u) SO4_y(u+1)], 'color' , pc3 ) ;     
 end
 %%%% plot this model
-plot((sens.time_myr),mean(sens.SmM,2),'linewidth',1,'color',c_mean)
+plot((sens.time_myr),nanmean(sens.SmM,2),'linewidth',1,'color',c_mean)
 plot((sens.time_myr),max(sens.SmM,[],2),'linewidth',0.5,'color',c_range)
 plot((sens.time_myr),min(sens.SmM,[],2),'linewidth',0.5,'color',c_range)
 
@@ -122,7 +132,7 @@ for u = 1:2:length(O2_x) - 1
    plot( [O2_x(u) O2_x(u)] , [O2_y(u) O2_y(u+1)] , 'color' , pc2  ) ;     
 end
 %%%% plot this model
-plot((sens.time_myr),mean(sens.mrO2.*100,2),'linewidth',1,'color',c_mean)
+plot((sens.time_myr),nanmean(sens.mrO2.*100,2),'linewidth',1,'color',c_mean)
 plot((sens.time_myr),max(sens.mrO2.*100,[],2),'linewidth',0.5,'color',c_range)
 plot((sens.time_myr),min(sens.mrO2.*100,[],2),'linewidth',0.5,'color',c_range)
 
@@ -155,7 +165,7 @@ plot(liverwort_age, liverwort_co2,'.','markerfacecolor',pc5,'markeredgecolor',pc
 % errorbar(phytane_age,phytane_co2,phytane_low,phytane_high,'color',[0.7 0.7 0.4],'linestyle','none')
 plot(phytane_age, phytane_co2,'.','markerfacecolor',pc6,'markeredgecolor',pc6)
 %%%% plot this model
-plot((sens.time_myr),mean(sens.CO2ppm,2),'linewidth',1,'color',c_mean)
+plot((sens.time_myr),nanmean(sens.CO2ppm,2),'linewidth',1,'color',c_mean)
 plot((sens.time_myr),max(sens.CO2ppm,[],2),'linewidth',0.5,'color',c_range)
 plot((sens.time_myr),min(sens.CO2ppm,[],2),'linewidth',0.5,'color',c_range)
 
@@ -169,15 +179,15 @@ ylabel('GAST (C)')
 %%%% plot data comparison
 patch(T_x,T_y,pc2,'edgecolor','none')
 %%%% plot this model
-plot((sens.time_myr),mean(sens.T_gast,2),'linewidth',1,'color',c_mean)
+plot((sens.time_myr),nanmean(sens.T_gast,2),'linewidth',1,'color',c_mean)
 plot((sens.time_myr),max(sens.T_gast,[],2),'linewidth',0.5,'color',c_range)
 plot((sens.time_myr),min(sens.T_gast,[],2),'linewidth',0.5,'color',c_range)
 %%%% plot this model torpical T
-plot((sens.time_myr),mean(sens.SAT_tropical,2),'linewidth',1,'color',c_mean,'linestyle',':')
+plot((sens.time_myr),nanmean(sens.SAT_tropical,2),'linewidth',1,'color',c_mean,'linestyle',':')
 plot((sens.time_myr),max(sens.SAT_tropical,[],2),'linewidth',0.5,'color',c_range,'linestyle',':')
 plot((sens.time_myr),min(sens.SAT_tropical,[],2),'linewidth',0.5,'color',c_range,'linestyle',':')
 %%%% plot this model equatorial T
-plot((sens.time_myr),mean(sens.SAT_equator,2),'linewidth',1,'color',c_mean,'linestyle',':')
+plot((sens.time_myr),nanmean(sens.SAT_equator,2),'linewidth',1,'color',c_mean,'linestyle',':')
 plot((sens.time_myr),max(sens.SAT_equator,[],2),'linewidth',0.5,'color',c_range,'linestyle',':')
 plot((sens.time_myr),min(sens.SAT_equator,[],2),'linewidth',0.5,'color',c_range,'linestyle',':')
 
@@ -190,7 +200,7 @@ ylabel('Ice line')
 %%%% plot iceline proxy
 plot(paleolat_x,paleolat_y,'color' ,pc2) ;
 %%%% plot this model
-plot((sens.time_myr),mean(sens.iceline,2),'linewidth',1,'color',c_mean)
+plot((sens.time_myr),nanmean(sens.iceline,2),'linewidth',1,'color',c_mean)
 plot((sens.time_myr),max(sens.iceline,[],2),'linewidth',0.5,'color',c_range)
 plot((sens.time_myr),min(sens.iceline,[],2),'linewidth',0.5,'color',c_range)
 
@@ -201,10 +211,10 @@ box on
 xlabel('Time (Ma)')
 ylabel('P (-), N (--)')
 %%%% plot this model
-plot((sens.time_myr),mean(sens.P,2),'linewidth',1,'color',c_mean)
+plot((sens.time_myr),nanmean(sens.P,2),'linewidth',1,'color',c_mean)
 plot((sens.time_myr),max(sens.P,[],2),'linewidth',0.5,'color',c_range)
 plot((sens.time_myr),min(sens.P,[],2),'linewidth',0.5,'color',c_range)
-plot((sens.time_myr),mean(sens.N,2),'--','linewidth',1,'color',c_mean)
+plot((sens.time_myr),nanmean(sens.N,2),'--','linewidth',1,'color',c_mean)
 plot((sens.time_myr),max(sens.N,[],2),'--','linewidth',0.5,'color',c_range)
 plot((sens.time_myr),min(sens.N,[],2),'--','linewidth',0.5,'color',c_range)
 

@@ -8,7 +8,7 @@ function dy = SCION_equations(t,y)
 %      11011------------------101         SCION: Spatial Continuous Integration                 %
 %     111-----------------10011011        Earth Evolution Model                                 %
 %    1--10---------------1111011111                                                             %
-%    1---1011011---------1010110111       Coded by Benjamin J. W. Mills                         %
+%    1---1011011---------1010110111       Lead developer: Benjamin J. W. Mills                  %
 %    1---1011000111----------010011       email: b.mills@leeds.ac.uk                            %
 %    1----1111011101----------10101                                                             %
 %     1----1001111------------0111        Model equations file                                  %
@@ -32,6 +32,8 @@ global gridstate
 global INTERPSTACK
 global sensanal
 global sensparams
+global tuning
+
 
 %%%%%%%%%%%%% get variables from Y to make working easier
 P = y(1) ;
@@ -90,9 +92,9 @@ W_reloaded = interp1qr( forcings.t', forcings.W' , t_geol ) ;
 %%%% Additional forcings
 GR_BA = interp1qr( forcings.GR_BA(:,1)./1e6 , forcings.GR_BA(:,2) , t_geol ) ;
 newGA = interp1qr( forcings.newGA(:,1)./1e6 , forcings.newGA(:,2) , t_geol ) ;
-D_combined_mid = interp1qr( forcings.D_force_x' , forcings.D_force_mid , t_geol) ;
-D_combined_min = interp1qr( forcings.D_force_x' , forcings.D_force_min , t_geol) ;
-D_combined_max = interp1qr( forcings.D_force_x' , forcings.D_force_max , t_geol) ;
+D_combined_mid = interp1qr( forcings.D_force_x' , forcings.D_force_mid' , t_geol) ;
+D_combined_min = interp1qr( forcings.D_force_x' , forcings.D_force_min' , t_geol) ;
+D_combined_max = interp1qr( forcings.D_force_x' , forcings.D_force_max' , t_geol) ;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%  Choose forcing functions  %%%%%%%%%%%%%%%%%%%%%%%%%
@@ -100,8 +102,6 @@ D_combined_max = interp1qr( forcings.D_force_x' , forcings.D_force_max , t_geol)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DEGASS = 1 ;
-% DEGASS = D_sbz_rift ;
-% DEGASS = D_merdith ;
 DEGASS = D_combined_mid ;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % W = 1 ;
@@ -117,8 +117,10 @@ Bforcing = interp1qr([-1000 -150 -100 0]',[0.75 0.75 1 1]',t_geol) ;
 % Bforcing = 1 ;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 BAS_AREA = GR_BA ;
+% BAS_AREA = 1 ;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 GRAN_AREA = newGA ;
+% GRAN_AREA = 1 ;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 PREPLANT = 1/4 ;
 capdelS = 27   ;
@@ -142,13 +144,13 @@ CB = interp1qr([0 1]',[1.2 1]',f_biot) ;
 if sensanal == 1
     
     %%%% Very degassing between upper and lower bounds
-    if sensparams.randminusplus1 > 0
+    if sensparams.randminusplus1 > 0 
         DEGASS = (1 - sensparams.randminusplus1)*DEGASS + sensparams.randminusplus1*D_combined_max ;
     else
         DEGASS = (1 + sensparams.randminusplus1)*DEGASS - sensparams.randminusplus1*D_combined_min ;
     end
-        
-    %%%% simple +/- 20% variation
+
+    % %%%% simple +/- 20% variation
     BAS_AREA = BAS_AREA * (1 + 0.2*sensparams.randminusplus2) ;
     GRAN_AREA = GRAN_AREA * (1 + 0.2*sensparams.randminusplus3) ;
     
@@ -160,6 +162,7 @@ if sensanal == 1
     capdelC_land = 25 + 5*sensparams.randminusplus6 ;
     capdelC_marine = 30 + 5*sensparams.randminusplus7 ;
 end
+
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -729,9 +732,9 @@ if sensanal == 0
 
 end
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%   Record plotting states only in sensanal   %%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%   Record plotting or tuning states only in sensanal or tuning %%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 if sensanal == 1
     workingstate.BAS_AREA(stepnumber,1) = BAS_AREA;
@@ -754,6 +757,16 @@ if sensanal == 1
     workingstate.time(stepnumber,1) = t;
 end
 
+if isempty(tuning) == 0
+    workingstate.Orel(stepnumber,1) = O/pars.O0 ;
+    workingstate.Srel(stepnumber,1) = S/pars.S0 ;
+    workingstate.Arel(stepnumber,1) = A/pars.A0 ;
+    workingstate.Crel(stepnumber,1) = C/pars.C0 ;
+    workingstate.Grel(stepnumber,1) = G/pars.G0 ;
+    workingstate.PYRrel(stepnumber,1) = PYR/pars.PYR0 ;
+    workingstate.GYPrel(stepnumber,1) = GYP/pars.GYP0 ;
+end
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%   Final actions   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -772,12 +785,6 @@ end
 
 %%%% record current model step
 stepnumber = stepnumber + 1 ;
-
-
-%%%% option to bail out if model is running aground
-if stepnumber > pars.bailnumber
-   terminateExecution
-end
 
 
 

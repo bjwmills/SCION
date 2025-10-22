@@ -87,20 +87,20 @@ for f = [1 2]
 
     %%%%%%% make figure
     figure('Color',[1 0.98 0.95])
-    ha = tight_subplot(length(choose_gridsubs),5,0,0.01,0.01) ;
+    ha = tight_subplot(length(choose_gridsubs),6,0,0.01,0.01) ;
 
     %%%% loop over number of gridstates
     subnumber = 1 ;
     for gridsub = choose_gridsubs
 
-        %%%% make topography
+        %%%% make topography map
         this_TOPO = gridstate.TOPO(:,:,gridsub) ;
         this_TOPO(this_TOPO<1) = NaN ;
         cmap = ttcmap([-5000 5000],'cmap','gmtrelief');
 
 
-        %%%% plot simplified topography
-        axes(ha( 1 + 5*( length(choose_gridsubs) - subnumber)  )) ;
+        %%%% plot topography
+        axes(ha( 1 + 6*( length(choose_gridsubs) - subnumber)  )) ;
         hold on
         m_proj('robinson','longitude',[-180 172.5],'latitude',[-86.6 86.6])
         h = m_pcolor(INTERPSTACK.lon - 180,INTERPSTACK.lat,this_TOPO) ;
@@ -111,12 +111,50 @@ for f = [1 2]
         text(4,0,num2str( round(gridstate.time_myr(gridsub) ) ))
 
 
+        %%%% make lithology map (1 = land, 2= relict arc, 3 = arc, 4 = suture)
+        RELICT_1_0 = gridstate.RELICT_ARC(:,:,gridsub) ;
+        RELICT_1_0(RELICT_1_0>0) = 1 ;
+        ARC_1_0 = gridstate.ARC(:,:,gridsub) ;
+        ARC_1_0(ARC_1_0>0) = 1 ;
+        SUTURE_1_0 = gridstate.SUTURE(:,:,gridsub) ;
+        SUTURE_1_0(SUTURE_1_0>0) = 1 ;
+
+        %%%% assemble together
+        this_LITHO = gridstate.land(:,:,gridsub) ;
+        this_LITHO = this_LITHO + RELICT_1_0 ;
+        this_LITHO = this_LITHO + 2*ARC_1_0 ;
+        this_LITHO = this_LITHO + 3*SUTURE_1_0 ;
+
+        %%%% colormap for litho
+        cmap = [
+        1.00 1.00 1.00;  % white
+        0.50 0.50 0.50;  % grey
+        0.00 0.45 0.74;  % blue
+        0.85 0.33 0.10;  % red
+        0.49 0.18 0.56;  % purple
+        ];
+        
+        
+        %%%% plot lithology
+        axes(ha( 2 + 6*( length(choose_gridsubs) - subnumber)  )) ;
+        hold on
+        m_proj('robinson','longitude',[-180 172.5],'latitude',[-86.6 86.6])
+        h = m_pcolor(INTERPSTACK.lon - 180,INTERPSTACK.lat,this_LITHO) ;
+        m_grid('box','on','xticklabels','','yticklabels','','linestyle','-','gridcolor',[0.7 0.7 0.7],'ticklength',0)
+        colormap(gca,cmap)
+        clim([0 4])
+        axis off
+        if gridsub == 1
+            text(4,0,'Lithology')
+        end
+
+
         %%%% Nan out the ocean on Tair
         thisfield = gridstate.Tair(:,:,gridsub);
         thisfield(gridstate.land(:,:,gridsub) == 0 ) = NaN ;
 
         %%%% plot Tair
-        axes(ha( 2 + 5*( length(choose_gridsubs) - subnumber)  )) ;
+        axes(ha( 3 + 6*( length(choose_gridsubs) - subnumber)  )) ;
         hold on
         m_proj('robinson','longitude',[-180 172.5],'latitude',[-86.6 86.6])
         h = m_pcolor(INTERPSTACK.lon - 180,INTERPSTACK.lat,thisfield) ;
@@ -134,7 +172,7 @@ for f = [1 2]
         thisfield(gridstate.land(:,:,gridsub) == 0 ) = NaN ;
  
         %%%% plot Q
-        axes(ha( 3 + 5*( length(choose_gridsubs) - subnumber)  )) ;
+        axes(ha( 4 + 6*( length(choose_gridsubs) - subnumber)  )) ;
         hold on
         m_proj('robinson','longitude',[-180 172.5],'latitude',[-86.6 86.6])
         h = m_pcolor(INTERPSTACK.lon - 180,INTERPSTACK.lat,log10(thisfield)) ;
@@ -152,7 +190,7 @@ for f = [1 2]
         thisfield(gridstate.land(:,:,gridsub) == 0 ) = NaN ;
  
         %%%% plot epsilon
-        axes(ha( 4 + 5*( length(choose_gridsubs) - subnumber)  )) ;
+        axes(ha( 5 + 6*( length(choose_gridsubs) - subnumber)  )) ;
         hold on
         m_proj('robinson','longitude',[-180 172.5],'latitude',[-86.6 86.6])
         h = m_pcolor(INTERPSTACK.lon - 180,INTERPSTACK.lat,log10(thisfield)) ;
@@ -170,7 +208,7 @@ for f = [1 2]
         thisfield(gridstate.land(:,:,gridsub) == 0 ) = NaN ;
 
         %%%% plot silw
-        axes(ha( 5 + 5*( length(choose_gridsubs) - subnumber)  )) ;
+        axes(ha( 6 + 6*( length(choose_gridsubs) - subnumber)  )) ;
         hold on
         m_proj('robinson','longitude',[-180 172.5],'latitude',[-86.6 86.6])
         h = m_pcolor(INTERPSTACK.lon - 180,INTERPSTACK.lat,log10(thisfield)) ;

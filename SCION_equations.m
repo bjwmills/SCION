@@ -92,9 +92,9 @@ W_reloaded = interp1qr( forcings.t', forcings.W' , t_geol ) ;
 %%%% Additional forcings
 GR_BA = interp1qr( forcings.GR_BA(:,1)./1e6 , forcings.GR_BA(:,2) , t_geol ) ;
 newGA = interp1qr( forcings.newGA(:,1)./1e6 , forcings.newGA(:,2) , t_geol ) ;
-D_combined_mid = interp1qr( forcings.D_force_x' , forcings.D_force_mid' , t_geol) ;
-D_combined_min = interp1qr( forcings.D_force_x' , forcings.D_force_min' , t_geol) ;
-D_combined_max = interp1qr( forcings.D_force_x' , forcings.D_force_max' , t_geol) ;
+D_combined_mid = interp1qr( forcings.D_force_x , forcings.D_force_mid , t_geol) ;
+D_combined_min = interp1qr( forcings.D_force_x , forcings.D_force_min , t_geol) ;
+D_combined_max = interp1qr( forcings.D_force_x , forcings.D_force_max , t_geol) ;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%  Choose forcing functions  %%%%%%%%%%%%%%%%%%%%%%%%%
@@ -113,16 +113,13 @@ EVO = E_reloaded ;
 CPLAND = 1 ;
 % CPLAND = CP_reloaded ;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-Bforcing = interp1qr([-1000 -150 -100 0]',[0.75 0.75 1 1]',t_geol) ;
-% Bforcing = 1 ;
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 BAS_AREA = GR_BA ;
 % BAS_AREA = 1 ;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 GRAN_AREA = newGA ;
 % GRAN_AREA = 1 ;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-PREPLANT = 1/4 ;
+PREPLANT = 1/7 ;
 capdelS = 27   ;
 capdelC_land = 27   ;
 capdelC_marine = 35  ;
@@ -242,6 +239,16 @@ GRID_AREA_km2 = INTERPSTACK.gridarea ;
 tslope_past = INTERPSTACK.slope(:,:,key_past_index) ;
 tslope_future = INTERPSTACK.slope(:,:,key_future_index) ;
 
+%%%% arcs from interpstack
+ARC_past = INTERPSTACK.arc(:,:,key_past_index) ;
+ARC_future = INTERPSTACK.arc(:,:,key_future_index) ;
+%%%% relict arcs from interpstack
+RELICT_ARC_past = INTERPSTACK.relict_arc(:,:,key_past_index) ;
+RELICT_ARC_future = INTERPSTACK.relict_arc(:,:,key_future_index) ;
+%%%% arcs from interpstack
+SUTURE_past = INTERPSTACK.suture(:,:,key_past_index) ;
+SUTURE_future = INTERPSTACK.suture(:,:,key_future_index) ;
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%   Spatial silicate weathering   %%%%%%%%%%%%%%%%%%%
@@ -292,9 +299,38 @@ R_reg_future = ( (z./EPSILON_future).^sigplus1 ) ./ sigplus1 ;
 %%%% equation for CW per km2 in each box
 CW_per_km2_past = 1e6 .* EPSILON_past .* Xm .* ( 1 - exp( -1.* K .* R_Q_past .* R_T_past .* R_reg_past ) ) ; 
 CW_per_km2_future = 1e6 .* EPSILON_future .* Xm .* ( 1 - exp( -1.* K .* R_Q_future .* R_T_future .* R_reg_future ) ) ; 
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%   Lithological weathering effects   %%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%% ARC weathering enhancement
+ARCfactor = 7 ;
+ARC_plusmap_past = (ARCfactor - 1).*ARC_past ;
+ARC_plusmap_future = (ARCfactor - 1).*ARC_future ;
+
+%%%% RELICT_ARC weathering enhancement
+RELICT_ARC_plusmap_past = (ARCfactor - 1).*RELICT_ARC_past ;
+RELICT_ARC_plusmap_future = (ARCfactor - 1).*RELICT_ARC_future ;
+
+%%%% SUTURE weathering enhancement
+SUTUREfactor = 20 ;
+SUTURE_plusmap_past = (SUTUREfactor - 1).*SUTURE_past ;
+SUTURE_plusmap_future = (SUTUREfactor - 1).*SUTURE_future ;
+
+%%%% add ARC, RELICT ARC and SUTURE weathering
+CW_per_km2_past = CW_per_km2_past.*(1 + ARC_plusmap_past + RELICT_ARC_plusmap_past + SUTURE_plusmap_past ) ;
+CW_per_km2_future = CW_per_km2_future.*(1 + ARC_plusmap_future + RELICT_ARC_plusmap_future + SUTURE_plusmap_future ) ;
+
+
+
+
 %%%% CW total
 CW_past = CW_per_km2_past .* GRID_AREA_km2 ;
 CW_future = CW_per_km2_future .* GRID_AREA_km2 ;
+
 %%%% world CW
 CW_past(isnan(CW_past)==1) = 0 ;
 CW_future(isnan(CW_future)==1) = 0 ;
@@ -321,7 +357,8 @@ CWcarb_sum_future = sum(sum(CWcarb_future)) ;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%% silicate weathering scale factor by present day rate in cation tonnes
-silw_scale = 4.2e8 ; %%%% for k erosion 3.3e-3
+% silw_scale = 4.2e8 ; %%%% for k erosion 3.3e-3
+silw_scale = 6.5e8 ; %%%% for k erosion 3.3e-3
 %%%% overall spatial weathering
 silw_spatial = CW_tot * ( (pars.k_basw + pars.k_granw) / silw_scale) ;
 carbw_spatial = ( CWcarb_sum_past*contribution_past + CWcarb_sum_future*contribution_future ) ;
@@ -423,7 +460,7 @@ sfw = pars.k_sfw * f_T_sfw * DEGASS ; %%% assume spreading rate follows degassin
 
 %%%%%%% Degassing 
 ocdeg = pars.k_ocdeg*DEGASS*(G/pars.G0) ;
-ccdeg = pars.k_ccdeg*DEGASS*(C/pars.C0)*Bforcing ;
+ccdeg = pars.k_ccdeg*DEGASS*(C/pars.C0) ;
 pyrdeg = pars.k_pyrdeg*(PYR/pars.PYR0)*DEGASS;
 gypdeg = pars.k_gypdeg*(GYP/pars.GYP0)*DEGASS;
 
@@ -651,7 +688,6 @@ if sensanal == 0
     workingstate.W(stepnumber,1) = W ;
     workingstate.EVO(stepnumber,1) = EVO ;
     workingstate.CPLAND(stepnumber,1) = CPLAND ;
-    workingstate.Bforcing(stepnumber,1) = Bforcing ;
     workingstate.BAS_AREA(stepnumber,1) = BAS_AREA ;
     workingstate.GRAN_AREA(stepnumber,1) = GRAN_AREA ;
     %%%%%%%% print variables
@@ -718,6 +754,9 @@ if sensanal == 0
             gridstate.CW(:,:,pars.gridstamp_number) = CW_per_km2_past ; %%% t/km2/yr
             gridstate.CWcarb(:,:,pars.gridstamp_number) = CWcarb_past ;
             gridstate.EPSILON(:,:,pars.gridstamp_number) = EPSILON_past * 1e6 ; %%% t/km2/yr
+            gridstate.ARC(:,:,pars.gridstamp_number) = ARC_past ;
+            gridstate.RELICT_ARC(:,:,pars.gridstamp_number) = RELICT_ARC_past ;
+            gridstate.SUTURE(:,:,pars.gridstamp_number) = SUTURE_past ;
 
             %%%% set next boundary
             if t_geol < 0

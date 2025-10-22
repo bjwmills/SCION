@@ -97,7 +97,6 @@ plot(state.time_myr,state.DEGASS,'r')
 plot(state.time_myr,state.BAS_AREA,'k')
 plot(state.time_myr,state.EVO,'g')
 plot(state.time_myr,state.W,'b')
-plot(state.time_myr,state.Bforcing,'m')
 plot(state.time_myr,state.GRAN_AREA,'color',[0.8 0.8 0.8])
 %%%% Legend
 text(-590,2.4,'D','color','r')
@@ -338,6 +337,7 @@ plot(phytane_age, phytane_co2,'.','markerfacecolor',pc6,'markeredgecolor',pc6)
 plot(state.time_myr,state.RCO2.*280,'k')
 
 
+
 %%%% TEMP
 subplot(4,4,15)
 hold on
@@ -352,6 +352,7 @@ plot(Scotese_2021_age,Scotese_2021_GAT,'color',pc1)
 %%%% plot this model
 plot(state.time_myr,state.tempC,'k')
 plot(state.time_myr,state.SAT_equator,'r')
+
 
 %%%% ICE LINE
 subplot(4,4,16)

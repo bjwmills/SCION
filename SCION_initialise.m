@@ -176,7 +176,7 @@ function run = SCION_initialise(runcontrol)
     end
 
     %%%% load INTERPSTACK
-    load( 'forcings/INTERPSTACK_1Ga_2025.mat' ) ;
+    load( 'forcings/INTERPSTACK_1Ga_weatherable_areas.mat' ) ;
     
 
     %%%% relative contribution from latitude bands
@@ -194,11 +194,11 @@ function run = SCION_initialise(runcontrol)
     forcings.newGA = xlsread('forcings/GA_revised.xlsx','','','basic') ;
     forcings.newGA(:,1) = forcings.newGA(:,1)*1e6 ; %%% correct Myr
     %%%% degassing rate
-    load('forcings/combined_D_force_1000_rev.mat') ;
-    forcings.D_force_x = xgrid ;    
-    forcings.D_force_min = newmin ;
-    forcings.D_force_max = newmax ;
-    forcings.D_force_mid = (newmin + newmax) ./ 2 ;
+    load('forcings/D_force_Merdith25_Mills25.mat') ;
+    forcings.D_force_x = D_force_x  ;    
+    forcings.D_force_min = D_force_min  ;
+    forcings.D_force_max = D_force_max  ;
+    forcings.D_force_mid = D_force_mid ;
     
     %%%% load shoreline forcing
     load('forcings/shoreline.mat') ;
@@ -319,8 +319,8 @@ function run = SCION_initialise(runcontrol)
     %%%%% if no tuning use previously tuned values
     if isempty(tuning) == 1
 
-        % outputs = [ 0.45 1 1.1 1 0.1 0.05 3 ] ;
-        outputs = [0.45	1 1.1 0.875 0.17 0.05 6.5] ;
+        outputs = [ 0.6 1 0.98 0.99 0.07 0.05 2.5 ] ;
+
         pars.gstart = pars.G0 * outputs(1) ;
         pars.cstart = pars.C0 * outputs(2) ;
         pars.pyrstart = pars.PYR0 * outputs(3) ;

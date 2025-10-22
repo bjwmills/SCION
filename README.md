@@ -8,7 +8,9 @@ SCION (Spatial Continuous IntegratiON) is a global climate-biogeochemical model 
   <img src="http://bjwmills.com/wp-content/uploads/2023/09/SCION_outline.png" alt="SCION" style="width:700px;"/>
 </p>
 
-### Requies MATLAB. 
+v1.3 - October 2025
+
+### Requires MATLAB. 
 
 For more information on model derivation and running the model, see the Guidebook in the documentation folder.
 

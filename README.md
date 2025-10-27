@@ -10,17 +10,20 @@ SCION (Spatial Continuous IntegratiON) is a global climate-biogeochemical model 
 
 v1.3 - October 2025
 
+
 ### Requires MATLAB - see package requirements below:
 
 •	M_Map plotting package: https://www.eoas.ubc.ca/~rich/map.html
 
 •	TTCmap.m colormaps from topotoolbox: https://github.com/wschwanghart/topotoolbox/blob/master/colormaps/ttcmap.m 
 
+
 ### Running the model
 
 Calling SCION_initialise(0) runs the model and plots full output. 
 
 Calling SCION_initialise(-1) runs model and plots only fluxes for brevity. 
+
 
 ### Full documentation:
 For more information on model derivation and running the model, see the Guidebook in the documentation folder.

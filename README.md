@@ -12,11 +12,15 @@ v1.3 - October 2025
 
 ### Requires MATLAB. 
 Current MATLAB package requirements (local machine only – HPC use does not return plots)
+
 •	M_Map plotting package: https://www.eoas.ubc.ca/~rich/map.html
+
 •	TTCmap.m colormaps from topotoolbox: https://github.com/wschwanghart/topotoolbox/blob/master/colormaps/ttcmap.m 
 
 Calling SCION_initialise(0) runs the model and plots full output. 
+
 Calling SCION_initialise(-1) runs model and plots only fluxes for brevity. 
+
 Calling SCION_initialise(-2) runs model for fixed present day forcings, use to check the present day steady state if modifying the model. Note that due to constant supply of carbon from the mantle and conversion to organic C, crustal organic C increases throughout all model runs.
 
 

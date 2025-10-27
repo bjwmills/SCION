@@ -20,7 +20,7 @@ v1.3 - October 2025
 
 <br />
 
-### Running the model
+### Running the model:
 
 Calling SCION_initialise(0) runs the model and plots full output. 
 
